@@ -1,6 +1,7 @@
 <script src="https://cdn.bootcss.com/flv.js/1.4.0/flv.min.js"></script>
 <video id="videoElement" style="width: 100%; height: 100%;"></video>
-<button onclick="flvPlayer.play();">Play</button>
+<div id="stream-info" style="position: absolute; left: 1rem; bottom: 1rem; color: white; background: black; font-size: 18px;">Yooooo</div>
+<button onclick="flvPlayer.play();">Manual Play button</button>
 <script>
     if (flvjs.isSupported()) {
         var videoElement = document.getElementById('videoElement');
@@ -25,6 +26,33 @@
             reloadPlayer();
         });
 
+        function updateInfo() {
+            var newText = buildInfoString();
+            document.getElementById('stream-info').innerHTML = newText;
+        }
+
+        function buildTimeString(seconds) {
+            var intSecs = Math.round(seconds);
+            var date = new Date(null);
+            date.setSeconds(intSecs);
+            var result = date.toISOString().substr(11, 8);
+            return result;
+        }
+
+        function buildInfoString() {
+            var uptime = flvPlayer.currentTime;
+            var width = flvPlayer.mediaInfo && flvPlayer.mediaInfo.width ? flvPlayer.mediaInfo.width : 0;
+            var height = flvPlayer.mediaInfo && flvPlayer.mediaInfo.height ? flvPlayer.mediaInfo.height : 0;
+
+            var bitrate = flvPlayer._statisticsInfo ? flvPlayer._statisticsInfo.speed * 8 : 0;
+
+            var droppedFrames = flvPlayer._statisticsInfo ? flvPlayer._statisticsInfo.droppedFrames : 0;
+            var decodedFrames = flvPlayer._statisticsInfo ? flvPlayer._statisticsInfo.decodedFrames : 1;
+            var frameRenderPercentage = (decodedFrames - droppedFrames) * 100 / (decodedFrames);
+
+            return `${width}x${height}p @ ${bitrate.toFixed(2)}kbps | RTMP uptime: ${buildTimeString(uptime)} | Frames: ${frameRenderPercentage.toFixed(1)}%`;
+        }
+
         function reloadPlayer() {
             flvPlayer.unload();
             flvPlayer.detachMediaElement();
@@ -33,6 +61,8 @@
             // the play request is a deferred promise that will wait until the source exists again
             flvPlayer.play();
         }
+
+        setInterval(updateInfo, 1000);
     }
 
 
