@@ -36,7 +36,7 @@ app.post('/notify-disconnect', function(req, res) {
 app.listen(port);
 
 const rtmpConfig = {
-    logType: 2,
+    logType: 3,
 
     rtmp: {
       port: 1935,
