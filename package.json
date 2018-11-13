@@ -1,5 +1,5 @@
 {
-  "name": "beta-quest-gps",
+  "name": "yuna",
   "version": "1.0.0",
   "description": "IRL RTMP Bridge for OBS",
   "main": "server.js",
