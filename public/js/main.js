@@ -1,5 +1,6 @@
 if (flvjs.isSupported()) {
     var videoElement = document.getElementById('videoElement');
+    var disconnects = 0;
     var flvPlayer = flvjs.createPlayer({
         type: 'flv',
         isLive: true,
@@ -13,11 +14,16 @@ if (flvjs.isSupported()) {
 
     flvPlayer.on(flvjs.Events.ERROR, () => {
         console.log('ERROR WAS THROWN!');
+        // TODO Notify server down via client Twilio
         reloadPlayer();
     });
 
     flvPlayer.on(flvjs.Events.LOADING_COMPLETE, () => {
         console.log('LOADING COMPLETE WAS THROWN!');
+        disconnects++;
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "/notify-disconnect", true);
+        xhr.send();
         reloadPlayer();
     });
 
@@ -35,7 +41,7 @@ if (flvjs.isSupported()) {
         var decodedFrames = flvPlayer._statisticsInfo ? flvPlayer._statisticsInfo.decodedFrames : 1;
         var frameRenderPercentage = (decodedFrames - droppedFrames) * 100 / (decodedFrames);
 
-        var newText = buildInfoString(width, height, bitrate, uptime, frameRenderPercentage);
+        var newText = buildInfoString(width, height, bitrate, uptime);
         document.getElementById('stream-info').innerHTML = newText;
     }
 
@@ -47,8 +53,8 @@ if (flvjs.isSupported()) {
         return result;
     }
 
-    function buildInfoString(width, height, bitrate, uptime, frameRenderPercentage) {
-        return `${width}x${height}p @ ${bitrate.toFixed(2)}kbps | RTMP uptime: ${buildTimeString(uptime)} | Frames: ${frameRenderPercentage.toFixed(1)}%`;
+    function buildInfoString(width, height, bitrate, uptime) {
+        return `${width}x${height}p @ ${bitrate.toFixed(2)}kbps | RTMP uptime: ${buildTimeString(uptime)} | Disconnects: ${disconnects}`;
     }
 
     function reloadPlayer() {
