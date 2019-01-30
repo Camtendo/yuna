@@ -7,7 +7,9 @@ An implementation of flvjs and node media server optimized for streaming rtmp vi
 - Can be captured via browser plugins to allow using alerts/"low bandwidth or disconnect" scenes and gifs when RTMP video state changes
 
 ## TODO Features
-- Coming soon
+- Server disconnect resiliency
+- OBS Remote integration
+- Configurable stream urls
 
 ## How to use
 1. Clone repo
